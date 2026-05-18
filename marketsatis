@@ -1,0 +1,195 @@
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+
+class Mehsul
+{
+    public int Id { get; set; }
+    public string Ad { get; set; }
+    public decimal Qiymet { get; set; }
+    public int Say { get; set; }
+
+    public Mehsul(int id, string ad, decimal qiymet, int say)
+    {
+        Id = id;
+        Ad = ad;
+        Qiymet = qiymet;
+        Say = say;
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        List<Mehsul> mehsullar = new List<Mehsul>();
+        decimal umumiGelir = 0m;
+
+        while (true)
+        {
+            Console.WriteLine("===== MARKET SATIS SISTEMI =====");
+            Console.WriteLine("1. Mehsul elave et");
+            Console.WriteLine("2. Mehsullari goster");
+            Console.WriteLine("3. Satis et");
+            Console.WriteLine("4. Umumi geliri goster");
+            Console.WriteLine("5. Cixis");
+            Console.Write("Seciminizi daxil edin: ");
+
+            string secim = Console.ReadLine() ?? string.Empty;
+            Console.WriteLine();
+
+            if (secim == "1")
+            {
+                int id;
+                while (true)
+                {
+                    Console.Write("Mehsul ID: ");
+                    string inputId = Console.ReadLine() ?? string.Empty;
+                    if (int.TryParse(inputId, out id))
+                    {
+                        if (mehsullar.Any(m => m.Id == id))
+                        {
+                            Console.WriteLine("Bu ID-ye malik mehsul artiq movcuddur. Bashqa ID daxil edin.");
+                            continue;
+                        }
+                        break;
+                    }
+                    Console.WriteLine("Duzgun ID daxil edin.");
+                }
+
+                Console.Write("Mehsul adi: ");
+                string ad = Console.ReadLine() ?? string.Empty;
+
+                decimal qiymet;
+                while (true)
+                {
+                    Console.Write("Qiymet: ");
+                    string raw = Console.ReadLine() ?? string.Empty;
+                    if (decimal.TryParse(raw, NumberStyles.Number, CultureInfo.InvariantCulture, out qiymet))
+                        break;
+                    if (decimal.TryParse(raw, out qiymet))
+                        break;
+                    Console.WriteLine("Duzgun qiymet daxil edin (orn: 12.50).");
+                }
+
+                int say;
+                while (true)
+                {
+                    Console.Write("Say: ");
+                    string inputSay = Console.ReadLine() ?? string.Empty;
+                    if (int.TryParse(inputSay, out say))
+                        break;
+                    Console.WriteLine("Duzgun say daxil edin.");
+                }
+
+                Mehsul yeniMehsul = new Mehsul(id, ad, qiymet, say);
+                mehsullar.Add(yeniMehsul);
+
+                Console.WriteLine("Mehsul elave olundu.\n");
+            }
+            else if (secim == "2")
+            {
+                if (mehsullar.Count == 0)
+                {
+                    Console.WriteLine("Mehsul yoxdur.\n");
+                }
+                else
+                {
+                    Console.WriteLine("Mehsullarin siyahisi:");
+
+                    for (int i = 0; i < mehsullar.Count; i++)
+                    {
+                        Console.WriteLine(
+                            "ID: " + mehsullar[i].Id +
+                            " | Ad: " + mehsullar[i].Ad +
+                            " | Qiymet: " + mehsullar[i].Qiymet.ToString("F2", CultureInfo.InvariantCulture) + " AZN" +
+                            " | Say: " + mehsullar[i].Say
+                        );
+                    }
+
+                    Console.WriteLine();
+                }
+            }
+            else if (secim == "3")
+            {
+                while (true)
+                {
+                    Console.Write("Satilacaq mehsulun ID-sini daxil edin: ");
+                    string inputSaleId = Console.ReadLine() ?? string.Empty;
+                    if (!int.TryParse(inputSaleId, out int id))
+                    {
+                        Console.WriteLine("Duzgun ID daxil edin.");
+                        continue;
+                    }
+
+                    bool tapildi = false;
+
+                    for (int i = 0; i < mehsullar.Count; i++)
+                    {
+                        if (mehsullar[i].Id == id)
+                        {
+                            tapildi = true;
+
+                            int satilanSay;
+                            while (true)
+                            {
+                                Console.Write("Nece eded satilsin: ");
+                                string inputSatilanSay = Console.ReadLine() ?? string.Empty;
+                                if (int.TryParse(inputSatilanSay, out satilanSay))
+                                    break;
+                                Console.WriteLine("Duzgun say daxil edin.");
+                            }
+
+                            if (satilanSay <= mehsullar[i].Say)
+                            {
+                                mehsullar[i].Say -= satilanSay;
+
+                                decimal mebleg = satilanSay * mehsullar[i].Qiymet;
+
+                                umumiGelir += mebleg;
+
+                                Console.WriteLine("Satis ugurla tamamlandi.");
+                                Console.WriteLine("Mebleg: " + mebleg.ToString("F2", CultureInfo.InvariantCulture) + " AZN\n");
+                            }
+                            else
+                            {
+                                Console.WriteLine("Kifayet qeder mehsul yoxdur.\n");
+                            }
+
+                            break;
+                        }
+                    }
+
+                    if (tapildi == false)
+                    {
+                        Console.WriteLine("Mehsul tapilmadi.\n");
+                    }
+
+                    Console.Write("Basqa mehsul satmaq isteyirsiniz? (beli/xeyr): ");
+                    string cavab = (Console.ReadLine() ?? string.Empty).ToLower();
+
+                    if (cavab != "beli")
+                    {
+                        break;
+                    }
+
+                    Console.WriteLine();
+                }
+            }
+            else if (secim == "4")
+            {
+                Console.WriteLine("Umumi gelir: " + umumiGelir.ToString("F2", CultureInfo.InvariantCulture) + " AZN\n");
+            }
+            else if (secim == "5")
+            {
+                Console.WriteLine("Proqram baglandi.");
+                break;
+            }
+            else
+            {
+                Console.WriteLine("Yanlis secim.\n");
+            }
+        }
+    }
+}
