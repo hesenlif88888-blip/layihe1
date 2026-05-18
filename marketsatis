@@ -70,7 +70,7 @@ class Program
                         break;
                     if (decimal.TryParse(raw, out qiymet))
                         break;
-                    Console.WriteLine("Duzgun qiymet daxil edin (orn: 12.50).");
+                    Console.WriteLine("Duzgun qiymet daxil edin (mes: 12.50).");
                 }
 
                 int say;
